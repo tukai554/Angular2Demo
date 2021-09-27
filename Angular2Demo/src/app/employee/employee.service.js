@@ -16,14 +16,32 @@ var Observable_1 = require("rxjs/Observable");
 require("rxjs/add/operator/map");
 require("rxjs/add/operator/catch");
 require("rxjs/add/observable/throw");
+require("rxjs/add/operator/toPromise");
 var EmployeeService = /** @class */ (function () {
     function EmployeeService(_http) {
         this._http = _http;
+        this._baseUri = "https://localhost:44329/api";
     }
     EmployeeService.prototype.getEmployees = function () {
-        return this._http.get("https://localhost:44329/api/Employees")
+        return this._http.get(this._baseUri + "/Employees")
             .map(function (response) { return response.json(); })
             .catch(this.handleError);
+    };
+    EmployeeService.prototype.getEmployeeByCode = function (empCode) {
+        return this._http.get("https://localhost:44329/api/Employees/" + empCode)
+            // .map((response: Response) => <IEmployee>response.json())
+            .toPromise()
+            .then(function (response) { return response.json(); })
+            .catch(this.handlePromiseError);
+    };
+    //getEmployeeByCode(empCode: string): Observable<IEmployee> {
+    //    return this._http.get(this._baseUri + "/Employees/" + empCode)
+    //        .map((response: Response) => <IEmployee>response.json())
+    //        .catch(this.handleError);
+    //}
+    EmployeeService.prototype.handlePromiseError = function (error) {
+        console.error(error);
+        throw (error);
     };
     EmployeeService.prototype.handleError = function (error) {
         console.error(error);
